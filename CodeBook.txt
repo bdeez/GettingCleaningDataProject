@@ -1,0 +1,76 @@
+CodeBook
+
+Table Names
+
+Source Data
+1. testdataX (2947 obs, 561 variables)
+2. traindataX (7352 obs, 561 variables)   
+3. testdataY (2947 obs, 1 variable - activity variable re: testdataX records)
+4. traindataY (7352 obs, 1 variable - activity variable re: traindataX records)
+5. activitylabels (6 obs, 2 variables - activity description for activity variable in testdataY and traindataY tables)
+6. features (561 obs, 2 variables - names of the observations in testdataX and testdataY tables)
+7. subject_test (2947 obs, 1 variable - subject variable re: testdataX records)
+8. subject_train (7352 obs, 1 variable - subject variable re: traindataX records)
+
+Output Data Frames
+1. prjdata (10299 obs, 564 variables)
+	- Composition of the eight source data files, manipulated into a master data table
+	- Column names added from features source data
+	- Columns added - activity and subject variables
+	- Test and Train datasets combined
+	- Narrowed to 69 variables in manipulation below
+
+2. tidydf (180 obs, 35 variables)
+	- Trimmed version of master prjdata table (limited to 'mean' measurements)
+	- Summarized by subject and activity
+
+** indicate where the above dataframes and any interim dataframes were created in the manipulation process
+* indicate where new variables or new variable names were introduced
+
+Core Process Steps
+
+1. Read tables in (as outlined in Source Data above)
+
+2. Add / Update column names for each table
+	- The observation names in the features table were added to testdataX and traindataY tables as column names.
+*	- The testdataY and traindataY columns were renamed to 'actnum' (interpret as activity number)
+*	- The activitylabels columns were remaned to 'actnum' and 'actdesc' (interpret as activity description)...to facilitate merge (ultimately followed subset method)
+*	- The subject_test and subject_train columns were renamed to 'subjectnum' (interpret as subject number)
+
+
+3. Add activity labels to Y tables (using subset approach)
+*	- actdesc values from activitylabels table were added via subset method to testdataY and traindataY tables
+	- per activitylabels table
+		1 = "WALKING"
+		2 = "WALKING_UPSTAIRS"
+		3 = "WALKING_DOWNSTAIRS"
+		4 = "SITTING"
+		5 = "STANDING"
+		6 = "LAYING"
+
+
+4. Update observation tables (testdataX and traindataX) by binding addition columns containing activity and subject variables
+	- testdataX and traindataX contain different observations, but are exact structure
+
+
+5. Bind testdataX and traindataX tables to create master project data frame
+**	- 'prjdata' is the new dataframe created (10299 obs, 564 variables)
+
+6. Trim project data frame to include only mean and std(standard deviation) values
+	- 'prjdata' now 69 variables down from 564	
+
+
+7. Trim dataframe down to only mean values, reorder columns and clean column names
+**	- 'tidydata' is new dataframe created (10299 obs, 35 variables)
+	- The observations (column names) can be inpreted exactly how they are structured in the following dataset (and as contained in the features source data):
+	
+		http://archive.ics.uci.edu/ml/datasets/Human+Activity+Recognition+Using+Smartphones
+
+*	- The observation names have been scrubbed to remove all "-", "()", and " " characters and all text was made lowercase.
+
+
+8. Group and summarize (tidydata) by subject and activity in new data frame
+**	- bysubact is an alternative version of tidydata that is grouped by subject and activity
+**	- tidydf is a new dataframe that summarizes the mean of each observation in bysubact by subject and activity (180 obs, 35 variables)
+
+9. Create txt file of tidydf (using write.table function)
